@@ -4,10 +4,39 @@ from connection import create_client
 from queries import get_queries
 from styles import dashboard_css
 from components import display_widget
+import matplotlib.pyplot as plt
+from matplotlib_venn import venn2
 
 # Streamlit app
 st.set_page_config(layout="wide")
 st.title("ClickHouse Dashboard")
+
+# Create columns for layout
+col1, col2 = st.columns(2)
+
+# Display the Venn diagram representation in column 1
+with col1:
+    st.subheader("Venn Diagram")
+    fig, ax = plt.subplots(figsize=(1, 1))  # Reduce the size of the Venn diagram
+    venn = venn2(subsets=(1, 1, 1), set_labels=('Promotional', 'Transactional'))
+    venn.get_label_by_id('10').set_text("A")
+    venn.get_label_by_id('01').set_text("C")
+    venn.get_label_by_id('11').set_text("B")
+    st.pyplot(fig)
+
+# Display the Venn diagram as text in column 2
+with col2:
+
+    st.subheader("User Base Analysis")
+    st.markdown(f"""
+    - **Total user base** = A + B + C
+    - **Promotional** = A + B
+    - **Transactional** = B + C
+    - **Common** = B
+
+    - **Total + Promo + Trans** = 2A + 2B + 2C + B
+    - **B** = Promo + Trans - Total
+    """)
 
 # Date filters
 start_date = st.date_input("Select start date", pd.to_datetime("today"))
@@ -28,7 +57,6 @@ client5 = create_client()
 
 # Execute the queries and fetch the results into DataFrames
 total_user_base_df = client1.query_df(queries['total_user_base'])
-otp_user_base_df = client2.query_df(queries['otp_user_base'])
 promotional_user_base_df = client3.query_df(queries['promotional_user_base'])
 transactional_user_base_df = client4.query_df(queries['transactional_user_base'])
 weekly_user_base_df = client5.query_df(queries['weekly_user_base'])
@@ -38,6 +66,5 @@ col1, col2, col3 = st.columns(3)
 
 # Display the results as dashboard widgets with graphs
 display_widget("Total User Base", total_user_base_df['total_user_base'][0], weekly_user_base_df, col1, 'blue')
-display_widget("OTP User Base", otp_user_base_df['otp_user_base'][0], weekly_user_base_df, col2, 'green')
-display_widget("Promotional User Base", promotional_user_base_df['promotional_user_base'][0], weekly_user_base_df, col3, 'red')
-display_widget("Transactional User Base", transactional_user_base_df['transactional_user_base'][0], weekly_user_base_df, col1, 'purple')
+display_widget("Promotional User Base", promotional_user_base_df['promotional_user_base'][0], weekly_user_base_df, col2, 'red')
+display_widget("Transactional User Base", transactional_user_base_df['transactional_user_base'][0], weekly_user_base_df, col3, 'purple')
