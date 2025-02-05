@@ -14,19 +14,8 @@ st.title("ClickHouse Dashboard")
 # Create columns for layout
 col1, col2 = st.columns(2)
 
-# Display the Venn diagram representation in column 1
+# Display the math in column 1
 with col1:
-    st.subheader("Venn Diagram")
-    fig, ax = plt.subplots(figsize=(1, 1))  # Reduce the size of the Venn diagram
-    venn = venn2(subsets=(1, 1, 1), set_labels=('Promotional', 'Transactional'))
-    venn.get_label_by_id('10').set_text("A")
-    venn.get_label_by_id('01').set_text("C")
-    venn.get_label_by_id('11').set_text("B")
-    st.pyplot(fig)
-
-# Display the Venn diagram as text in column 2
-with col2:
-
     st.subheader("User Base Analysis")
     st.markdown(f"""
     - **Total user base** = A + B + C
@@ -37,6 +26,10 @@ with col2:
     - **Total + Promo + Trans** = 2A + 2B + 2C + B
     - **B** = Promo + Trans - Total
     """)
+
+# Leave column 2 empty
+with col2:
+    st.empty()
 
 # Date filters
 start_date = st.date_input("Select start date", pd.to_datetime("today"))
